@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Google Sign In</title>
+		<script
+			src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"
+			defer
+		></script>
+		<script
+			src="https://accounts.google.com/gsi/client"
+			async
+			defer
+		></script>
+	</head>
+	<body>
+		<h1>Google Sign In</h1>
+		<!-- Los siguientes dos divs es donde se renderizará el boton de logeo de google -->
+		<!-- Estos tienen atributos que sirven para configurar dicho boton de manera personalizada -->
+		<div
+			id="g_id_onload"
+			data-client_id="907736487483-f47fm2f9ar4tv3un1ga4p44899hddnlt.apps.googleusercontent.com"
+			data-auto_prompt="false"
+			data-callback="handleCredentialResponse"
+		></div>
+		<!-- En el div inferior podemos indicar los atributos que generan el estilo del boton de logeo de google -->
+		<!-- En la página de google Identity puedes entrar al generador del botón que nos permite generar el estilo de este botón de manera sencilla con un generador de código https://developers.google.com/identity/gsi/web/tools/configurator?hl=en -->
+
+		<div
+			class="g_id_signin"
+			data-type="standard"
+			data-shape="pill"
+			data-theme="filled_black"
+			data-text="$ {button.text}"
+			data-size="large"
+			data-locale="es"
+			data-logo_alignment="left"
+		></div>
+
+		<button id="signout">Signout</button>
+
+		<script>
+			//Función que se ejecuta al finalizar el proceso de logeo de google, callback que devuelve una response con las credenciales del usuario logeado.
+			async function handleCredentialResponse(response) {
+				const body = { id_token: response.credential };
+				console.log(body);
+				await axios({
+					method: "POST",
+					url: "/api/auth/google",
+					data: body,
+				})
+					.then((res) => {
+						console.log(res.data);
+						//Almacenamos el correo del usuario logeado y lo almacenamos en localstorage para poder utilizarlo luego para realizar el logout
+						localStorage.setItem("correo", res.data.usuario.correo);
+						location.reload();
+					})
+					.catch((err) => {
+						console.log(err);
+						console.log(err?.response?.data);
+					});
+				//Google Token A.K.A = ID_TOKEN
+				// console.log("id_token:", response.credential);
+			}
+
+			//Llamamos al boton para asignarle el evento click
+			const signoutButton = document.querySelector("#signout");
+			signoutButton.addEventListener("click", () => {
+				console.log(google.accounts.id); //Esta propiedad nos permite acceder a los métodos para realizar correctamente el logout
+				//??
+				google.accounts.id.disableAutoSelect();
+				//Método para realizar el logout. Enviamos como primer parámetro el correo del usuario que deseamos deslogear.
+				google.accounts.id.revoke(
+					localStorage.getItem("correo"),
+					//Como segundo parametro enviamos un callback que se ejecutará al momento de haberse completado el deslogueo correctamente.
+					(done) => {
+						//limpiamos localstorage y recargamos la página.
+						localStorage.clear();
+						location.reload();
+					}
+				);
+			});
+		</script>
+	</body>
+</html>

@@ -57,6 +57,8 @@ class Server {
 			fileUpload({
 				useTempFiles: true,
 				tempFileDir: "/tmp/",
+				// Esta propiedad nos permite darle permiso a la express-fileuploads que en el caso de que la ruta de la carpeta que hayamos especificado en el método mv() a la hora de recivir un archivo, se cree automáticamente y pueda ser accedida. [No se recomienda utilizar esta propiedad porque no muestra ciertos errores y hace parecer que todo el programa esta funcionando correctamente]
+				createParentPath: true,
 			})
 		);
 	}

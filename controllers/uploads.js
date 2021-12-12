@@ -13,7 +13,7 @@ const cargarArchivo = async (req, res) => {
 	}
 
 	try {
-		const nombre = await subirArchivos(req.files, ["jpg", "pdf"]);
+		const nombre = await subirArchivos(req.files, ["pdf"], "pdf");
 		res.json({ nombre });
 	} catch (error) {
 		console.log(error);

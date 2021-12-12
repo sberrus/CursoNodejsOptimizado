@@ -1,3 +1,5 @@
+//todo: Unificar busqueda de existencia de documento en la bbdd reciviendo el id del documento o el string del nombre para hacerla más flexible.
+
 //Validadores para usar en las funciones custom de la libreria express-validator en su cadena de validaciones
 const { Role, Usuario, Categoria, Product } = require("../models");
 
@@ -17,6 +19,11 @@ const existeEmail = async (correo = "") => {
 		);
 	}
 };
+
+/**
+ * Comprueba si el usuario existe en la BBDD mediante su MONGOID
+ * @param {*} id MONGOID
+ */
 const existeUsuarioPorId = async (id) => {
 	const existeUsuario = await Usuario.findById(id);
 	if (!existeUsuario) {
@@ -28,12 +35,23 @@ const existeUsuarioPorId = async (id) => {
 
 /**
  * Comprueba si la categoria existe en la DDBB
- * @param {*} id ID de mongoose de la categoria
+ * @param {*} id MongoID de la categoria
  */
 const existeCategoria = async (id) => {
 	const categoria = await Categoria.findById(id);
 	if (!categoria) {
 		throw new Error(`La categoria no existe en la BBDD`);
+	}
+};
+
+/**
+ * Verifica si existe la categoria a partir de su nombre
+ * @param {*} nombre Nombre de categoria -- String
+ */
+const existeCategoriaPorNombre = async (nombre = "") => {
+	const categoria = await Categoria.findOne({ nombre: nombre.toUpperCase() });
+	if (!categoria) {
+		throw new Error(`La cateogoria ${nombre} no existe en la BBDD`);
 	}
 };
 
@@ -57,6 +75,21 @@ const existeProducto = async (id = "") => {
 	if (!producto) throw new Error("El producto no existe en la bbdd");
 };
 
+/**
+ * Colecciones permitidas
+ */
+
+const coleccionesPermitidas = (coleccion = "", coleccionesPermitidas = []) => {
+	const incluida = coleccionesPermitidas.includes(coleccion);
+
+	if (!incluida) {
+		throw new Error(
+			`La colección ${coleccion}, no esta permitida. Las colecciones permitidas son: ${coleccionesPermitidas}`
+		);
+	}
+
+	return true;
+};
 module.exports = {
 	esRoleValido,
 	existeEmail,
@@ -64,4 +97,6 @@ module.exports = {
 	existeCategoria,
 	existeNombre,
 	existeProducto,
+	existeCategoriaPorNombre,
+	coleccionesPermitidas,
 };

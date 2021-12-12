@@ -1,5 +1,11 @@
+//Imports
 const express = require("express");
+
+//Middlewares
 const cors = require("cors");
+const fileUpload = require("express-fileupload");
+
+//Configs
 const { dbConection } = require("../database/config");
 
 class Server {
@@ -45,6 +51,14 @@ class Server {
 
 		//Lectura y parseo del body
 		this.app.use(express.json());
+
+		//Carga de archivos
+		this.app.use(
+			fileUpload({
+				useTempFiles: true,
+				tempFileDir: "/tmp/",
+			})
+		);
 	}
 
 	routes() {

@@ -19,6 +19,7 @@ class Server {
 			categories: "/api/categories",
 			products: "/api/products",
 			busquedas: "/api/busquedas",
+			uploads: "/api/uploads",
 		};
 
 		//DB Conection
@@ -53,6 +54,7 @@ class Server {
 		this.app.use(this.paths.categories, require("../routes/categories"));
 		this.app.use(this.paths.products, require("../routes/products"));
 		this.app.use(this.paths.busquedas, require("../routes/busquedas"));
+		this.app.use(this.paths.uploads, require("../routes/uploads"));
 	}
 	listen() {
 		this.app.listen(this.port, () => {

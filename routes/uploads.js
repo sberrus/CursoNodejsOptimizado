@@ -17,10 +17,9 @@ router.put(
 	[
 		check("id")
 			.notEmpty()
+			.withMessage("Debes enviar un id")
 			.isMongoId()
-			.withMessage("El id no es un ID válido de Mongo")
-			.bail()
-			.custom(existeUsuarioPorId),
+			.withMessage("El id no es un ID válido de Mongo"),
 		check("coleccion").custom((c) =>
 			coleccionesPermitidas(c, ["usuarios", "productos"])
 		),

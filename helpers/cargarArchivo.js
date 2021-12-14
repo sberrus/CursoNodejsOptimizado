@@ -19,7 +19,11 @@ const subirArchivos = (
 ) => {
 	return new Promise((resolve, reject) => {
 		//Capturamos el archivo que nos envia el cliente
-		const { archivo } = files;
+		const archivo = files?.archivo;
+
+		if (!archivo) {
+			return reject("No se ha enviado ningun archivo en la petición");
+		}
 
 		//extraemos la extensión del archivo
 		const nombreCortado = archivo.name.split(".");

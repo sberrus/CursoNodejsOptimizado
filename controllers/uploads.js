@@ -61,7 +61,7 @@ const actualizarImagenUsuario = async (req, res) => {
 		res.json(modelo);
 	} catch (error) {
 		console.log(error);
-		return res.status(500).json({ msg: "no se pudo actualizar la imagen" });
+		return res.status(500).json({ msg: error });
 	}
 };
 

@@ -5,16 +5,6 @@ const { subirArchivos } = require("../helpers");
 const { Product, Usuario } = require("../models");
 
 const cargarArchivo = async (req, res) => {
-	//Verifica si hay archivos en la petición
-	if (
-		!req.files ||
-		Object.keys(req.files).length === 0 ||
-		!req.files.archivo
-	) {
-		res.status(400).json({ msg: "No files were uploaded." });
-		return;
-	}
-
 	try {
 		const nombre = await subirArchivos(req.files, ["pdf"], "pdf");
 		res.json({ nombre });
@@ -33,17 +23,13 @@ const actualizarImagenUsuario = async (req, res) => {
 		case "usuarios":
 			modelo = await Usuario.findById(id);
 			if (!modelo) {
-				return res
-					.status(400)
-					.json({ msg: `No existe un usuario con el id ${id}` });
+				return res.status(400).json({ msg: `No existe un usuario con el id ${id}` });
 			}
 			break;
 		case "productos":
 			modelo = await Product.findById(id);
 			if (!modelo) {
-				return res
-					.status(400)
-					.json({ msg: `No existe un producto con el id ${id}` });
+				return res.status(400).json({ msg: `No existe un producto con el id ${id}` });
 			}
 			break;
 		default:
@@ -60,7 +46,6 @@ const actualizarImagenUsuario = async (req, res) => {
 
 		res.json(modelo);
 	} catch (error) {
-		console.log(error);
 		return res.status(500).json({ msg: error });
 	}
 };

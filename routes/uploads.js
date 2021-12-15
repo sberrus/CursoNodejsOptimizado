@@ -4,25 +4,24 @@ const { check } = require("express-validator");
 
 //Controllers
 const { cargarArchivo, actualizarImagenUsuario } = require("../controllers");
-const { existeUsuarioPorId, coleccionesPermitidas } = require("../helpers");
-const { validarCampos, validarJWT } = require("../middlewares");
+const { coleccionesPermitidas } = require("../helpers");
+const { validarCampos, validarArchivo } = require("../middlewares");
 
 //App
 const router = Router();
 
-router.post("/", cargarArchivo);
+router.post("/", validarArchivo, cargarArchivo);
 
 router.put(
 	"/:coleccion/:id",
 	[
+		validarArchivo,
 		check("id")
 			.notEmpty()
 			.withMessage("Debes enviar un id")
 			.isMongoId()
 			.withMessage("El id no es un ID válido de Mongo"),
-		check("coleccion").custom((c) =>
-			coleccionesPermitidas(c, ["usuarios", "productos"])
-		),
+		check("coleccion").custom((c) => coleccionesPermitidas(c, ["usuarios", "productos"])),
 		validarCampos,
 	],
 	actualizarImagenUsuario

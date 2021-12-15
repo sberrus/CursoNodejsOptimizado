@@ -1,6 +1,9 @@
-//Imports
+//Node Imports
 const path = require("path");
 const fs = require("fs");
+
+//Imports
+const { response } = require("express");
 
 //Helpers
 const { subirArchivos } = require("../helpers");
@@ -65,4 +68,45 @@ const actualizarImagen = async (req, res) => {
 	}
 };
 
-module.exports = { cargarArchivo, actualizarImagenUsuario: actualizarImagen };
+const mostrarImagen = async (req, res = response) => {
+	const { id, coleccion } = req.params;
+	let modelo;
+
+	switch (coleccion) {
+		case "usuarios":
+			modelo = await Usuario.findById(id);
+			if (!modelo) {
+				//Como estamos trabajando con imagenes podemos modificar el comportamiento en el caso de que no encuentre nada tomando en cuenta los requerimientos del proyecto, podemos enviar una imágen por defecto, avisar de que no se encuentra el archivo o cualquier otro comportamiento.
+				return res.status(400).json({ msg: `No existe un usuario con el id ${id}` });
+			}
+			break;
+		case "productos":
+			modelo = await Product.findById(id);
+			if (!modelo) {
+				//Como estamos trabajando con imagenes podemos modificar el comportamiento en el caso de que no encuentre nada tomando en cuenta los requerimientos del proyecto, podemos enviar una imágen por defecto, avisar de que no se encuentra el archivo o cualquier otro comportamiento.
+				return res.status(400).json({ msg: `No existe un producto con el id ${id}` });
+			}
+			break;
+		default:
+			return res.status(500).json({
+				msg: "No se ha implementado esta función jeje sorry :)",
+			});
+	}
+
+	try {
+		//Comprobamos que en el modelo haya una imagen definida.
+		if (modelo.img) {
+			const pathImagen = path.join(__dirname, "../uploads", coleccion, modelo.img); //Construimos la ruta de la imágen que deseamos comprobar
+			//Verificamos que la imágen existe en físico
+			if (!fs.existsSync(pathImagen)) {
+				res.status(500).json({ msg: "Falta placeholder" });
+			}
+			return res.sendFile(pathImagen);
+		}
+		res.json({ msg: "Falta placeholder" });
+	} catch (error) {
+		return res.status(500).json({ msg: "Falta placeholder" });
+	}
+};
+
+module.exports = { cargarArchivo, actualizarImagen, mostrarImagen };

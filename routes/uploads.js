@@ -3,7 +3,7 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 
 //Controllers
-const { cargarArchivo, actualizarImagenUsuario } = require("../controllers");
+const { cargarArchivo, actualizarImagen, mostrarImagen } = require("../controllers");
 const { coleccionesPermitidas } = require("../helpers");
 const { validarCampos, validarArchivo } = require("../middlewares");
 
@@ -24,7 +24,21 @@ router.put(
 		check("coleccion").custom((c) => coleccionesPermitidas(c, ["usuarios", "productos"])),
 		validarCampos,
 	],
-	actualizarImagenUsuario
+	actualizarImagen
+);
+
+router.get(
+	"/:coleccion/:id",
+	[
+		check("id")
+			.notEmpty()
+			.withMessage("Debes enviar un id")
+			.isMongoId()
+			.withMessage("El id no es un ID válido de Mongo"),
+		check("coleccion").custom((c) => coleccionesPermitidas(c, ["usuarios", "productos"])),
+		validarCampos,
+	],
+	mostrarImagen
 );
 
 module.exports = router;

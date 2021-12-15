@@ -1,3 +1,7 @@
+//Imports
+const path = require("path");
+const fs = require("fs");
+
 //Helpers
 const { subirArchivos } = require("../helpers");
 
@@ -14,7 +18,7 @@ const cargarArchivo = async (req, res) => {
 	}
 };
 
-const actualizarImagenUsuario = async (req, res) => {
+const actualizarImagen = async (req, res) => {
 	const { coleccion, id } = req.params;
 
 	let modelo;
@@ -39,6 +43,17 @@ const actualizarImagenUsuario = async (req, res) => {
 	}
 
 	try {
+		//Limpiar imágenes previas
+		if (modelo.img) {
+			//Hay que borrar la imagen del servidor
+			const pathImagen = path.join(__dirname, "../uploads", coleccion, modelo.img); //Construimos la ruta de la imágen que deseamos comprobar
+			//Verificamos que la imágen existe
+			if (fs.existsSync(pathImagen)) {
+				//Si existe la eliminamos
+				fs.unlinkSync(pathImagen);
+			}
+		}
+
 		//Guardamos la imagen en la BBDD y capturamos el nombre para actualizar la información en la BBDD
 		const nombre = await subirArchivos(req.files, undefined, coleccion);
 		modelo.img = nombre;
@@ -50,4 +65,4 @@ const actualizarImagenUsuario = async (req, res) => {
 	}
 };
 
-module.exports = { cargarArchivo, actualizarImagenUsuario };
+module.exports = { cargarArchivo, actualizarImagenUsuario: actualizarImagen };

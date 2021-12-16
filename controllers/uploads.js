@@ -92,7 +92,7 @@ const mostrarImagen = async (req, res = response) => {
 				msg: "No se ha implementado esta función jeje sorry :)",
 			});
 	}
-
+	const placeholderPath = path.join(__dirname, "../assets/placeholder.jpg");
 	try {
 		//Comprobamos que en el modelo haya una imagen definida.
 		if (modelo.img) {
@@ -103,9 +103,9 @@ const mostrarImagen = async (req, res = response) => {
 			}
 			return res.sendFile(pathImagen);
 		}
-		res.json({ msg: "Falta placeholder" });
+		return res.sendFile(placeholderPath);
 	} catch (error) {
-		return res.status(500).json({ msg: "Falta placeholder" });
+		return res.sendFile(placeholderPath);
 	}
 };
 

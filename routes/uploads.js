@@ -3,7 +3,7 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 
 //Controllers
-const { cargarArchivo, actualizarImagen, mostrarImagen } = require("../controllers");
+const { cargarArchivo, mostrarImagen, actualizarImagenCloudinary } = require("../controllers");
 const { coleccionesPermitidas } = require("../helpers");
 const { validarCampos, validarArchivo } = require("../middlewares");
 
@@ -24,7 +24,8 @@ router.put(
 		check("coleccion").custom((c) => coleccionesPermitidas(c, ["usuarios", "productos"])),
 		validarCampos,
 	],
-	actualizarImagen
+	actualizarImagenCloudinary
+	// actualizarImagen --> Modificamos el controlador que almacena los archivos en el servidor y usamos mejor el servicio de CDN de Cloudinary
 );
 
 router.get(

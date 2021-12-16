@@ -4,6 +4,8 @@ const fs = require("fs");
 
 //Imports
 const { response } = require("express");
+const cloudinary = require("cloudinary").v2;
+cloudinary.config(process.env.CLOUDINARY_URL);
 
 //Helpers
 const { subirArchivos } = require("../helpers");
@@ -67,6 +69,57 @@ const actualizarImagen = async (req, res) => {
 		return res.status(500).json({ msg: error });
 	}
 };
+const actualizarImagenCloudinary = async (req, res) => {
+	const { coleccion, id } = req.params;
+
+	let modelo;
+
+	switch (coleccion) {
+		case "usuarios":
+			modelo = await Usuario.findById(id);
+			if (!modelo) {
+				return res.status(400).json({ msg: `No existe un usuario con el id ${id}` });
+			}
+			break;
+		case "productos":
+			modelo = await Product.findById(id);
+			if (!modelo) {
+				return res.status(400).json({ msg: `No existe un producto con el id ${id}` });
+			}
+			break;
+		default:
+			return res.status(500).json({
+				msg: "No se ha implementado esta función jeje sorry :)",
+			});
+	}
+
+	try {
+		//TODO: Eliminar archivos con proposito ya existente.
+		// if (modelo.img) {
+		// 	const pathImagen = path.join(__dirname, "../uploads", coleccion, modelo.img);
+		// 	if (fs.existsSync(pathImagen)) {
+		// 		fs.unlinkSync(pathImagen);
+		// 	}
+		// }
+
+		//SUBIENDO IMAGEN A CLOUDINARY
+
+		//extrayendo ubicación temporal del archivo que nos envia el cliente para enviarlo a Cloudinary.
+		const { tempFilePath } = req.files.archivo;
+
+		//Enviamos al método upload como argumento la ruta en el ordenador local donde se encuentra el archivo que deseamos enviar a cloudinary.
+		//Como sabemos, express-fileupload almacena de manera temporal los archivos que enviamos en una carpeta predeterminada parecida a "/tmp/***/***" en esta se encuentra el archivo que enviaremos a Cloudinary.
+
+		const { secure_url } = await cloudinary.uploader.upload(tempFilePath);
+
+		modelo.img = secure_url;
+		await modelo.save();
+
+		res.json(modelo);
+	} catch (error) {
+		return res.status(500).json({ msg: error });
+	}
+};
 
 const mostrarImagen = async (req, res = response) => {
 	const { id, coleccion } = req.params;
@@ -109,4 +162,4 @@ const mostrarImagen = async (req, res = response) => {
 	}
 };
 
-module.exports = { cargarArchivo, actualizarImagen, mostrarImagen };
+module.exports = { cargarArchivo, actualizarImagen, actualizarImagenCloudinary, mostrarImagen };

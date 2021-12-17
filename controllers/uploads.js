@@ -94,13 +94,12 @@ const actualizarImagenCloudinary = async (req, res) => {
 	}
 
 	try {
-		//TODO: Eliminar archivos con proposito ya existente.
-		// if (modelo.img) {
-		// 	const pathImagen = path.join(__dirname, "../uploads", coleccion, modelo.img);
-		// 	if (fs.existsSync(pathImagen)) {
-		// 		fs.unlinkSync(pathImagen);
-		// 	}
-		// }
+		//Si la imagen ya existe la eliminamos de Cloudinary
+		if (modelo.img) {
+			const imgFile = modelo.img.split("/").pop(); //File with extension
+			const imgFileName = imgFile.split(".")[0]; //Only file name without extension
+			await cloudinary.uploader.destroy(imgFileName); //Delete the old img from Cloudinary
+		}
 
 		//SUBIENDO IMAGEN A CLOUDINARY
 

@@ -161,4 +161,50 @@ const mostrarImagen = async (req, res = response) => {
 	}
 };
 
-module.exports = { cargarArchivo, actualizarImagen, actualizarImagenCloudinary, mostrarImagen };
+const mostrarImagenCloudinary = async (req, res = response) => {
+	const { id, coleccion } = req.params; //URL Params
+
+	//Modelo
+	let modelo;
+
+	switch (coleccion) {
+		case "usuarios":
+			modelo = await Usuario.findById(id);
+			if (!modelo) {
+				return res.status(400).json({ msg: `No existe un usuario con el id ${id}` });
+			}
+			break;
+		case "productos":
+			modelo = await Product.findById(id);
+			if (!modelo) {
+				return res.status(400).json({ msg: `No existe un producto con el id ${id}` });
+			}
+			break;
+		default:
+			return res.status(500).json({
+				msg: "No se ha implementado esta función jeje sorry :)",
+			});
+	}
+
+	const placeholderPath = path.join(__dirname, "../assets/placeholder.png");
+
+	//Comprobar que exista la imágen o mostrar el placeholder
+	//https://res.cloudinary.com/samdev/image/upload/v1639855436/e6l3ed9ykzubjsffkygm.jpg
+	try {
+		if (modelo.img) {
+			const pathImagen = modelo.img;
+			return res.json(pathImagen);
+		}
+		return res.sendFile(placeholderPath);
+	} catch (error) {
+		return res.sendFile(placeholderPath);
+	}
+};
+
+module.exports = {
+	cargarArchivo,
+	actualizarImagen,
+	actualizarImagenCloudinary,
+	mostrarImagen,
+	mostrarImagenCloudinary,
+};

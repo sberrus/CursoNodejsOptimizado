@@ -3,18 +3,19 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 
 //Controllers
-const { cargarArchivo, mostrarImagen, actualizarImagenCloudinary } = require("../controllers");
+const { actualizarImagenCloudinary, mostrarImagenCloudinary } = require("../controllers");
 const { coleccionesPermitidas } = require("../helpers");
-const { validarCampos, validarArchivo } = require("../middlewares");
+const { validarCampos, validarArchivo, validarJWT } = require("../middlewares");
 
 //App
 const router = Router();
 
-router.post("/", validarArchivo, cargarArchivo);
+// router.post("/", validarArchivo, cargarArchivo);
 
 router.put(
 	"/:coleccion/:id",
 	[
+		validarJWT,
 		validarArchivo,
 		check("id")
 			.notEmpty()
@@ -39,7 +40,7 @@ router.get(
 		check("coleccion").custom((c) => coleccionesPermitidas(c, ["usuarios", "productos"])),
 		validarCampos,
 	],
-	mostrarImagen
+	mostrarImagenCloudinary
 );
 
 module.exports = router;
